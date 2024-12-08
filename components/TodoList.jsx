@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import ListForm from '@/components/ListForm';
 import TDListModal from '@/components/TDListModal';
 
-const URL_APP = 'http://localhost:3333/todo';
+const URL_APP = '/api/todo';
 
 const fetcher = async () => {
     const response = await fetch(URL_APP);
