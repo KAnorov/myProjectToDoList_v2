@@ -7,13 +7,13 @@ import TDListModal from '@/components/TDListModal';
 const URL_APP = '/api/todo';
 // const URL_APP = 'http://localhost:3333/todo';
 
-const fetcher = async () => {
-    const response = await fetch(URL_APP);
-    console.log('response=',response )
+const fetcher = async (url) => {
+    const response = await fetch(url);
+    console.log('fetcher=',response )
     if (!response.ok) {
         throw new Error('Ошибка при загрузке данных','fetch ' + response.status);
     }
-    console.log('response2=',response )
+   
     return response.json();
     
 };
@@ -55,8 +55,7 @@ export default function TodoList() {
     const [todoData, setTodoData] = useState({ title: '', completed: false });
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const { data: todo, error, isValidating } = useSWR('todo', fetcher);
+    const { data: todo, error, isValidating } = useSWR(URL_APP, fetcher);
 
     const handleAddTodo = async () => {
         try {
