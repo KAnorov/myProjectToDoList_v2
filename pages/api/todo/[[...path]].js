@@ -10,7 +10,7 @@ const
 
         const rows = await sql `SELECT * FROM todo`;
         response.status(200).json(rows);
-    
+    console.log('id=', id)
         return;
     }
   
