@@ -9,14 +9,18 @@ const URL_APP = '/api/todo';
 
 const fetcher = async () => {
     const response = await fetch(URL_APP);
+    console.log('response=',response )
     if (!response.ok) {
         throw new Error('Ошибка при загрузке данных');
     }
+    console.log('response2=',response )
     return response.json();
+    
 };
 
 const deleteTodo = async (id) => {
     const response = await fetch(`${URL_APP}/${id}`, { method: 'DELETE' });
+    
     if (!response.ok) {
         throw new Error('Ошибка при удалении задания');
     }

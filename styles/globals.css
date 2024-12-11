@@ -1,5 +1,6 @@
 .container {
-  margin:  auto 400px;
+  width: clamp(400px,50%,800px);
+  margin:  auto auto;
   padding: 20px;
   font-family: sans-serif;
   background-color: #f4f4f4;
@@ -29,6 +30,7 @@ button:hover {
 }
 
 ul {
+  
   list-style-type: none;
   padding: 0;
 }
