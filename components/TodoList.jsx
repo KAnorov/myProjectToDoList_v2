@@ -18,12 +18,13 @@ const fetcher = async (url) => {
     
 };
 
-const deleteTodo = async (id) => {
+const deleteTodo = async (id, todo) => {
     const response = await fetch(`${URL_APP}/${id}`, { method: 'DELETE' });
     
     if (!response.ok) {
         throw new Error('Ошибка при удалении задания');
     }
+    console.log('удалена задача=id',id )
     return true;
 };
 
@@ -36,6 +37,7 @@ const addTodo = async (todo) => {
     if (!response.ok) {
         throw new Error('Ошибка при добавлении задания');
     }
+    console.log('Добавлена задача=',todo)
     return response.json();
 };
 
@@ -48,6 +50,7 @@ const editTodo = async (id, todo) => {
     if (!response.ok) {
         throw new Error('Ошибка при редактировании задания');
     }
+    console.log('editTodo=',id,todo)
     return response.json();
 };
 
