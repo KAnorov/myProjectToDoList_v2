@@ -4,7 +4,7 @@ const
 
   export default async function todo(request, response) {
     const
-      { query, method } = request,
+      { query } = request,
       { path } = query,
       id = path?.[0];
 
