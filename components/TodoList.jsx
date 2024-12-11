@@ -5,6 +5,7 @@ import ListForm from '@/components/ListForm';
 import TDListModal from '@/components/TDListModal';
 
 const URL_APP = '/api/todo';
+// const URL_APP = 'http://localhost:3333/todo';
 
 const fetcher = async () => {
     const response = await fetch(URL_APP);
