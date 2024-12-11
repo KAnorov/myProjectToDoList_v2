@@ -11,7 +11,7 @@ const fetcher = async () => {
     const response = await fetch(URL_APP);
     console.log('response=',response )
     if (!response.ok) {
-        throw new Error('Ошибка при загрузке данных');
+        throw new Error('Ошибка при загрузке данных','fetch ' + response.status);
     }
     console.log('response2=',response )
     return response.json();
