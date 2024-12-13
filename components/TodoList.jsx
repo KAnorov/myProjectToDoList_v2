@@ -13,14 +13,12 @@ const fetcher = async (url) => {
     if (!response.ok) {
         throw new Error('Ошибка при загрузке данных','fetch ' + response.status);
     }
-   
     return response.json();
     
 };
 
-const deleteTodo = async (id, todo) => {
+const deleteTodo = async (id) => {
     const response = await fetch(`${URL_APP}/${id}`, { method: 'DELETE' });
-    
     if (!response.ok) {
         throw new Error('Ошибка при удалении задания');
     }
