@@ -1,44 +1,44 @@
 {
   "todo": [
     {
-      "title": "мasvvvv",
-      "completed": false,
+      "text": "мasvvvv",
+      "checked": false,
       "id": "34a0"
     },
     {
-      "title": "fdgd+++",
-      "completed": false,
+      "text": "fdgd+++",
+      "checked": false,
       "id": "a0ca"
     },
     {
       "id": "bfc8",
-      "title": "22222",
-      "completed": false
+      "text": "22222",
+      "checked": false
     },
     {
-      "title": "vvv++",
-      "completed": false,
+      "text": "vvv++",
+      "checked": false,
       "id": "a872"
     },
     {
       "id": "b6d0",
-      "title": "dfdfgdg",
-      "completed": false
+      "text": "dfdfgdg",
+      "checked": false
     },
     {
       "id": "59cc",
-      "title": "ммм",
-      "completed": false
+      "text": "ммм",
+      "checked": false
     },
     {
       "id": "f903",
-      "title": "11111",
-      "completed": false
+      "text": "11111",
+      "checked": false
     },
     {
       "id": "9f98",
-      "title": "qwr2",
-      "completed": false
+      "text": "qwr2",
+      "checked": false
     }
   ]
 }

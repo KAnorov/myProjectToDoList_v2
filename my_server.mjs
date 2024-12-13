@@ -6,8 +6,8 @@ const database = new DatabaseSync('./todo.sqlite');
 database.exec(`
   CREATE TABLE IF NOT EXISTS todo (
     id INTEGER PRIMARY KEY,
-    title TEXT,
-    completed INTEGER DEFAULT 0
+    text TEXT,
+    checked INTEGER DEFAULT 0
   )
 `);
 
@@ -51,11 +51,11 @@ const server = createServer(async (req, res) => {
   } 
   else if (method === 'POST' && url === '/todo') {
     try {
-      const { title } = await readBody(req);
-      const addSt = database.prepare(`INSERT INTO todo (title) VALUES (?)`);
-      const info = addSt.run(title);
+      const { text } = await readBody(req);
+      const addSt = database.prepare(`INSERT INTO todo (text) VALUES (?)`);
+      const info = addSt.run(text);
       res.writeHead(201);
-      res.end(JSON.stringify({ id: info.lastInsertRowid, title, completed: 0 }));
+      res.end(JSON.stringify({ id: info.lastInsertRowid, text, checked: 0 }));
     } catch (error) {
       res.writeHead(400);
       res.end(JSON.stringify({ error: 'Ошибка при добавлении задания' }));
@@ -72,9 +72,9 @@ const server = createServer(async (req, res) => {
     const id = parsePath(url).base;
     try {
       const body = await readBody(req);
-      const { completed } = body;
-      const updateSt = database.prepare(`UPDATE todo SET completed = ? WHERE id = ?`);
-      updateSt.run(completed ? 1 : 0, id);
+      const { checked } = body;
+      const updateSt = database.prepare(`UPDATE todo SET checked = ? WHERE id = ?`);
+      updateSt.run(checked ? 1 : 0, id);
       res.writeHead(200);
       res.end();
     } catch (error) {
@@ -86,11 +86,11 @@ const server = createServer(async (req, res) => {
     const id = parsePath(url).base; 
     try {
       const body = await readBody(req);
-      const { title, completed } = body; 
-      const updateSt = database.prepare(`UPDATE todo SET title = ?, completed = ? WHERE id = ?`);
-      updateSt.run(title, completed ? 1 : 0, id);
+      const { text, checked } = body; 
+      const updateSt = database.prepare(`UPDATE todo SET text = ?, checked = ? WHERE id = ?`);
+      updateSt.run(text, checked ? 1 : 0, id);
       res.writeHead(200);
-      res.end(JSON.stringify({ id, title, completed: completed ? 1 : 0 }));
+      res.end(JSON.stringify({ id, text, checked: checked ? 1 : 0 }));
     } catch (error) {
       res.writeHead(400);
 

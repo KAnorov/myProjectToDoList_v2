@@ -53,7 +53,7 @@ const editTodo = async (id, todo) => {
 };
 
 export default function TodoList() {
-    const [todoData, setTodoData] = useState({ title: '', completed: false });
+    const [todoData, setTodoData] = useState({ text: '', checked: false });
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data: todo, error, isValidating } = useSWR(URL_APP, fetcher);
@@ -63,7 +63,7 @@ export default function TodoList() {
             await addTodo(todoData);
             toast.success('Задание успешно добавлено');
             await mutate('todo');
-            setTodoData({ title: '', completed: false });
+            setTodoData({ text: '', checked: false });
             setIsModalOpen(false);
         } catch (error) {
             toast.error(error.message);
@@ -85,7 +85,7 @@ export default function TodoList() {
             await editTodo(editingTodoId, todoData);
             toast.success('Задание успешно обновлено');
             await mutate('todo');
-            setTodoData({ title: '', completed: false });
+            setTodoData({ text: '', checked: false });
             setEditingTodoId(null);
             setIsModalOpen(false);
         } catch (error) {
@@ -94,32 +94,32 @@ export default function TodoList() {
     };
 
     const openModalForAdd = () => {
-        setTodoData({ title: '', completed: false });
+        setTodoData({ text: '', checked: false });
         setEditingTodoId(null);
         setIsModalOpen(true);
     };
 
     const openModalForEdit = (todo) => {
-        const { id, title, completed } = todo;
+        const { id, text, checked } = todo;
         setEditingTodoId(id);
-        setTodoData({ title, completed });
+        setTodoData({ text, checked });
 
         setIsModalOpen(true);
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setTodoData({ title: '', completed: false });
+        setTodoData({ text: '', checked: false });
         setEditingTodoId(null);
     };
     const
         handleChange = (field) => (e) => {
             switch (field) {
                 case 'todoData':
-                    setTodoData({ ...todoData, title: e.target.value })
+                    setTodoData({ ...todoData, text: e.target.value })
                     break;
-                case 'completed':
-                    setTodoData({ ...todoData, completed: e.target.checked })
+                case 'checked':
+                    setTodoData({ ...todoData, checked: e.target.checked })
                     break;
             }
         };

@@ -6,8 +6,8 @@ export default function TDListModal({ todo, openModalForAdd, openModalForEdit, h
             {todo?.map(todo => (
                 <li key={todo.id}>
                     <div>
-                        <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
-                            {todo.title}
+                        <span style={{ textDecoration: todo.checked ? 'line-through' : 'none' }}>
+                            {todo.text}
                         </span>
                     </div>
                     <div>
