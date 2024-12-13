@@ -1,154 +1,53 @@
-import useSWR, { mutate } from 'swr';
-import { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import ListForm from '@/components/ListForm';
-import TDListModal from '@/components/TDListModal';
+import { neon } from '@neondatabase/serverless';
 
-const URL_APP = '/api/todo';
-// const URL_APP = 'http://localhost:3333/todo';
+const sql = neon(process.env.POSTGRES_URL);
 
-const fetcher = async (url) => {
-    const response = await fetch(url);
-    console.log('fetcher=',response )
-    if (!response.ok) {
-        throw new Error('Ошибка при загрузке данных','fetch ' + response.status);
-    }
-    return response.json();
-    
-};
+export default async function todo(request, response) {
+  const { method } = request;
+  console.log('<<', method, request.body);
 
-const deleteTodo = async (id) => {
-    const response = await fetch(`${URL_APP}/${id}`, { method: 'DELETE' });
-    if (!response.ok) {
-        throw new Error('Ошибка при удалении задания');
-    }
-    console.log('удалена задача=id',id )
-    return true;
-};
+  try {
+    switch (method) {
+      case 'GET':
+        const rows = await sql `SELECT * FROM todo;`;
+        response.status(200).json(rows);
+        break;
 
-const addTodo = async (todo) => {
-    const response = await fetch(URL_APP, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(todo),
-    });
-    if (!response.ok) {
-        throw new Error('Ошибка при добавлении задания');
-    }
-    console.log('Добавлена задача=',todo)
-    return response.json();
-};
+      case 'DELETE':
+        const { path } = request.query;
+        const id = path?.[0];
 
-const editTodo = async (id, todo) => {
-    const response = await fetch(`${URL_APP}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(todo),
-    });
-    if (!response.ok) {
-        throw new Error('Ошибка при редактировании задания');
-    }
-    console.log('editTodo=',id,todo)
-    return response.json();
-};
-
-export default function TodoList() {
-    const [todoData, setTodoData] = useState({ text: '', checked: false });
-    const [editingTodoId, setEditingTodoId] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const { data: todo, error, isValidating } = useSWR(URL_APP, fetcher);
-
-    const handleAddTodo = async () => {
-        try {
-            await addTodo(todoData);
-            toast.success('Задание успешно добавлено');
-            await mutate('todo');
-            setTodoData({ text: '', checked: false });
-            setIsModalOpen(false);
-        } catch (error) {
-            toast.error(error.message);
+        if (!id) {
+          return response.status(400).json({ error: 'ID is required for deletion' });
         }
-    };
 
-    const handleDeleteTodo = async (id) => {
-        try {
-            await deleteTodo(id);
-            toast.success('Задание успешно удалено');
-            await mutate('todo');
-        } catch (error) {
-            toast.error(error.message);
+        const deleteResult = await sql `DELETE FROM todo WHERE id=${id} RETURNING *;`;
+        if (deleteResult.count === 0) {
+          return response.status(404).json({ error: 'Todo not found' });
         }
-    };
+        
+        console.log('Deleted item:', deleteResult);
+        response.status(200).json({ message: 'Todo deleted successfully' });
+        break;
 
-    const handleEditTodo = async () => {
-        try {
-            await editTodo(editingTodoId, todoData);
-            toast.success('Задание успешно обновлено');
-            await mutate('todo');
-            setTodoData({ text: '', checked: false });
-            setEditingTodoId(null);
-            setIsModalOpen(false);
-        } catch (error) {
-            toast.error(error.message);
+      case 'POST':
+        if (!request.body.text) {
+          return response.status(400).json({ error: 'text is required' });
         }
-    };
+        
+        const result2 = await sql `INSERT INTO todo (text) VALUES (${request.body.text}) RETURNING *;`;
+        console.log('Added item:', result2);
+        
+        response.status(201).json(result2);
+        break;
 
-    const openModalForAdd = () => {
-        setTodoData({ text: '', checked: false });
-        setEditingTodoId(null);
-        setIsModalOpen(true);
-    };
-
-    const openModalForEdit = (todo) => {
-        const { id, text, checked } = todo;
-        setEditingTodoId(id);
-        setTodoData({ text, checked });
-
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setTodoData({ text: '', checked: false });
-        setEditingTodoId(null);
-    };
-    const
-        handleChange = (field) => (e) => {
-            switch (field) {
-                case 'todoData':
-                    setTodoData({ ...todoData, text: e.target.value })
-                    break;
-                case 'checked':
-                    setTodoData({ ...todoData, checked: e.target.checked })
-                    break;
-            }
-        };
-
-    if (isValidating) return <div>Загрузка заданий...</div>;
-    if (error) return <div>Ошибка загрузки заданий: {error.message}</div>;
-
-    return <>
-        <div className="container">
-            <TDListModal
-                todo={todo}
-                openModalForAdd={openModalForAdd}
-                openModalForEdit={openModalForEdit}
-                handleDeleteTodo={handleDeleteTodo}
-            />
-            {isModalOpen && (
-                <div className="modal">
-            <ListForm
-                isModalOpen={isModalOpen}
-                handleChange={handleChange}
-                todoData={todoData}
-                setTodoData={setTodoData}
-                editingTodoId={editingTodoId}
-                handleAddTodo={handleAddTodo}
-                handleEditTodo={handleEditTodo}
-                closeModal={closeModal}
-            />
-            </div>
-            )}
-        </div>
-        </>;
+      // default:
+      //   response.setHeader('Allow', ['GET', 'POST', 'DELETE']);
+      //   response.status(405).end(`Method ${method} Not Allowed`);
+      //   break;
+    }
+  } catch (error) {
+    console.error('Database query error:', error.message);
+    response.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
 }
