@@ -52,6 +52,10 @@ export default function TodoList() {
     };
 
     const handleAddTodo = async () => {
+        if (!todoData.text.trim()) {
+            toast.error('Задание не может быть пустым!');
+            return;
+        }
         try {
             await addTodo(todoData);
             toast.success('Задание успешно добавлено');
@@ -76,7 +80,11 @@ export default function TodoList() {
         mutate();
     };
 
-    const handleEditTodo = async () => {
+    const handleEditTodo = async () => {     
+        if (!todoData.text.trim()) {
+            toast.error('Задание не может быть пустым!');
+            return;
+        }  
         try {
             await editTodo(editingTodoId, todoData);
             toast.success('Задание успешно обновлено');
