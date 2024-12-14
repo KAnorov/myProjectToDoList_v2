@@ -1,6 +1,7 @@
 export default function ListForm({ todoData, editingTodoId, handleAddTodo, handleEditTodo, closeModal, handleChange }) {
     const { text, checked } = todoData;
     return <>
+    
         <fieldset >
             <h3>{editingTodoId ? 'Редактировать задание?' : 'Добавить задание?'}</h3>
             <textarea placeholder="Введите текс..." value={text} onChange={handleChange('todoData')}></textarea>

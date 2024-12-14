@@ -16,7 +16,11 @@ export default async function todo(request, response) {
       case 'POST':
         return response.status(201).json(await sql `INSERT INTO todolist (text, checked) VALUES (${request.body.text}, false)`);
       case 'PUT':
-        return response.status(200).json(await sql `UPDATE todolist SET text = ${request.body.text} WHERE id = ${id}`);;
+        return response.status(200).json(await sql `UPDATE todolist SET text = ${request.body.text} WHERE id = ${id}`);
+        case 'PATCH':
+        const checked= await response.status(200).json()
+        console.log('PATCH=', {checked})
+          return 
     }
   } catch (error) {
     response.status(500).json({ error: 'Ошибка сервера!!!' });

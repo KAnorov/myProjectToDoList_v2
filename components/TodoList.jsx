@@ -125,7 +125,7 @@ export default function TodoList() {
         <div className="container">
 
             <div
-                style={{ position: 'absolute', fontSize: 'xxx-large' }}>
+                style={{ position: 'absolute', fontSize: 'xxx-large', top: '200px' }}>
                 {isLoading && '⌛'}
                 {isValidating && '👁'}
                 {error && `💀 ${error.toString()}`}
@@ -140,6 +140,7 @@ export default function TodoList() {
                 openModalForEdit={openModalForEdit}
                 handleDeleteTodo={handleDeleteTodo}
             />
+            
             {isModalOpen && (
                 <div className="modal">
                     <ListForm
