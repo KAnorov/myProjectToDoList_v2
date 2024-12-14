@@ -7,12 +7,12 @@ export default function TDListModal({ todo, openModalForAdd, openModalForEdit, h
         <ul>
             {todo?.map(todo => (
                 <li key={todo.id}>
-                    <div>
+                    <div className="div-content">
                         <span style={{ textDecoration: todo.checked ? 'line-through' : 'none' }}>
                             {todo.text}
                         </span>
                     </div>
-                    <div>
+                    <div className="button-click">
                         <button onClick={() => openModalForEdit(todo)}>🖊 </button>
                         <button onClick={() => handleDeleteTodo(todo.id)}>❌</button>
                     </div>
