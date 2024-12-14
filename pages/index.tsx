@@ -1,8 +1,8 @@
-import TodoList from "@/components/TodoList";
+import  ToDoList  from "@/components/TodoList";
 export default function GetUsers() {
     return <>
         <main>
-            <TodoList />
+            <ToDoList />
         </main>
     </>;
 
