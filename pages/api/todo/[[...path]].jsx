@@ -10,30 +10,15 @@ export default async function todo(request, response) {
   try {
     switch (method) {
       case 'GET':
-        const rows = await sql`SELECT * FROM todolist`;
-        response.status(200).json(rows);
-        return;
-
+        return response.status(200).json(await sql `SELECT * FROM todolist`);
       case 'DELETE':
-        await sql`DELETE FROM todolist WHERE id = ${id}`;
-        response.status(200).send();
-        return;
-
+        return response.status(200).send(await sql `DELETE FROM todolist WHERE id = ${id}`);;
       case 'POST':
-        await sql`INSERT INTO todolist (text, checked) VALUES (${request.body.text}, false)`;
-        response.status(201).send();
-        return;
-
+        return response.status(201).json(await sql `INSERT INTO todolist (text, checked) VALUES (${request.body.text}, false)`);
       case 'PUT':
-        if (!id) {
-          return response.status(400).json({ error: 'ID задания не указан для обновления' });
-        }
-        await sql`UPDATE todolist SET text = ${request.body.text} WHERE id = ${id}`;
-        response.status(200).send();
-        return;
+        return response.status(200).json(await sql `UPDATE todolist SET text = ${request.body.text} WHERE id = ${id}`);;
     }
   } catch (error) {
-    console.error('Ошибка при обработке запроса:', error);
     response.status(500).json({ error: 'Ошибка сервера!!!' });
   }
 }

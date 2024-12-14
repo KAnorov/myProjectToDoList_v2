@@ -20,7 +20,7 @@ export default function TodoList() {
     const [todoData, setTodoData] = useState({ text: '', checked: false });
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { data: todo, error, isValidating, mutate } = useSWR(URL_APP, fetcher);
+    const { data: todo, error, isValidating, isLoading, mutate } = useSWR(URL_APP, fetcher);
 
     const editTodo = async (id, todo) => {
         const response = await fetch(`${URL_APP}/${id}`, {
@@ -48,7 +48,7 @@ export default function TodoList() {
             throw new Error('Ошибка при добавлении задания: ' + errorMessage);
         }
 
-        return response.json(); 
+        return response.json();
     };
 
     const handleAddTodo = async () => {
@@ -105,20 +105,23 @@ export default function TodoList() {
         return (e) => {
             switch (field) {
                 case 'todoData':
-                    setTodoData({ ...todoData, text: e.target.value });
+                    setTodoData({ ...todoData, text: e.currentTarget.value });
                     break;
                 case 'checked':
-                    setTodoData({ ...todoData, checked: e.target.checked });
+                    setTodoData({ ...todoData, checked: e.currentTarget.checked });
                     break;
             }
         };
     }
-
-    if (isValidating) return <div>Загрузка заданий...</div>;
-    if (error) return <div>Ошибка загрузки заданий: {error.message}</div>;
-
     return <>
         <div className="container">
+
+            <div
+                style={{ position: 'absolute', fontSize: 'xxx-large' }}>
+                {isLoading && '⌛'}
+                {isValidating && '👁'}
+                {error && `💀 ${error.toString()}`}
+            </div>
             <TDListModal
                 todo={todo}
                 openModalForAdd={() => {
