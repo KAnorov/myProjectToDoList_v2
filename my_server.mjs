@@ -68,20 +68,6 @@ const server = createServer(async (req, res) => {
     res.writeHead(204);
     res.end();
   } 
-  else if (method === 'PATCH' && url.startsWith('/todo/')) {
-    const id = parsePath(url).base;
-    try {
-      const body = await readBody(req);
-      const { checked } = body;
-      const updateSt = database.prepare(`UPDATE todo SET checked = ? WHERE id = ?`);
-      updateSt.run(checked ? 1 : 0, id);
-      res.writeHead(200);
-      res.end();
-    } catch (error) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Ошибка при обновлении задания' }));
-    }
-  }
   else if (method === 'PUT' && url.startsWith('/todo/')) {
     const id = parsePath(url).base; 
     try {
@@ -91,6 +77,7 @@ const server = createServer(async (req, res) => {
       updateSt.run(text, checked ? 1 : 0, id);
       res.writeHead(200);
       res.end(JSON.stringify({ id, text, checked: checked ? 1 : 0 }));
+      console.log('checked======', checked)
     } catch (error) {
       res.writeHead(400);
 

@@ -22,20 +22,6 @@ export default function TodoList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { data: todo, error, isValidating, isLoading, mutate } = useSWR(URL_APP, fetcher);
 
-    const editTodo = async (id, todo) => {
-        const response = await fetch(`${URL_APP}/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(todo),
-        });
-        setIsModalOpen(false);
-        if (!response.ok) {
-            setIsModalOpen(false);
-            throw new Error('Ошибка при редактировании задания');
-        }
-        return response.json();
-    };
-
     const addTodo = async (todo) => {
         const response = await fetch(URL_APP, {
             method: 'POST',
@@ -50,23 +36,37 @@ export default function TodoList() {
 
         return response.json();
     };
-
+    const editTodo = async (id, todo) => {
+        const response = await fetch(`${URL_APP}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(todo),
+        });
+        if (!response.ok) {
+            throw new Error('Ошибка при редактировании задания');
+        }
+        return response.json();
+    };
     const handleAddTodo = async () => {
         if (!todoData.text.trim()) {
             toast.error('Задание не может быть пустым!');
             return;
         }
+        const newTodo = { ...todoData, id: Date.now(), createdAt: new Date() };
+        mutate((currentTodos) => [...(currentTodos || []), newTodo], false);
         try {
-            await addTodo(todoData);
+            const addedTodo = await addTodo(todoData);
             toast.success('Задание успешно добавлено');
+            mutate((currentTodos) => currentTodos.map((todo) => todo.id === newTodo.id ? { ...todo, id: addedTodo.id } : todo), false);
             setTodoData({ text: '', checked: false });
             setIsModalOpen(false);
         } catch (error) {
             toast.error(error.message);
+            mutate((currentTodos) => currentTodos.filter((todo) => todo.id !== newTodo.id), false);
         }
-
         mutate();
-    }
+
+    };
     const handleDeleteTodo = async (id) => {
         try {
             const response = await fetch(`${URL_APP}/${id}`, { method: 'DELETE' });
@@ -74,53 +74,63 @@ export default function TodoList() {
                 throw new Error('Ошибка при удалении задания');
             }
             toast.success('Задание успешно удалено');
+            mutate();
         } catch (error) {
             toast.error(error.message);
         }
-        mutate();
     };
-
-    const handleEditTodo = async () => {     
+    const handleEditTodo = async () => {
         if (!todoData.text.trim()) {
             toast.error('Задание не может быть пустым!');
             return;
-        }  
+        }
         try {
             await editTodo(editingTodoId, todoData);
             toast.success('Задание успешно обновлено');
             setTodoData({ text: '', checked: false });
             setEditingTodoId(null);
             setIsModalOpen(false);
+            mutate();
         } catch (error) {
             toast.error(error.message);
         }
-        mutate();
     };
+    const handleChange = (field) => async (event) => {
+        const value = field === 'checked' ? event.target.checked : event.target.value;
+        setTodoData((prevTodoData) => ({ ...prevTodoData, [field]: value, }));
+        if (editingTodoId) {
+            try {
+                const response = await fetch(`${URL_APP}/${editingTodoId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [field]: value }),
+                });
 
-    function openModalForEdit(todo) {
-        const { id, text, checked } = todo;
-        setEditingTodoId(id);
-        setTodoData({ text, checked });
+                if (!response.ok) {
+                    throw new Error('Ошибка обновления задачи');
+                }
+                const data = await response.json();
+                console.log('Задача обновлена:', data);
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+    };
+    const openModalForAdd = () => {
+        setTodoData({ text: '', checked: false });
+        setEditingTodoId(null);
         setIsModalOpen(true);
-    }
-
-    function closeModal() {
+    };
+    const openModalForEdit = (todo) => {
+        setEditingTodoId(todo.id);
+        setTodoData({ text: todo.text, checked: todo.checked });
+        setIsModalOpen(true);
+    };
+    const closeModal = () => {
         setIsModalOpen(false);
         setTodoData({ text: '', checked: false });
         setEditingTodoId(null);
-    }
-    function handleChange(field) {
-        return (e) => {
-            switch (field) {
-                case 'todoData':
-                    setTodoData({ ...todoData, text: e.currentTarget.value });
-                    break;
-                case 'checked':
-                    setTodoData({ ...todoData, checked: e.currentTarget.checked });
-                    break;
-            }
-        };
-    }
+    };
     return <>
         <div className="container">
 
@@ -132,26 +142,20 @@ export default function TodoList() {
             </div>
             <TDListModal
                 todo={todo}
-                openModalForAdd={() => {
-                    setTodoData({ text: '', checked: false });
-                    setEditingTodoId(null);
-                    setIsModalOpen(true);
-                }}
+                openModalForAdd={openModalForAdd}
                 openModalForEdit={openModalForEdit}
                 handleDeleteTodo={handleDeleteTodo}
             />
-            
+
             {isModalOpen && (
                 <div className="modal">
                     <ListForm
-                        isModalOpen={isModalOpen}
-                        handleChange={handleChange}
                         todoData={todoData}
-                        setTodoData={setTodoData}
                         editingTodoId={editingTodoId}
                         handleAddTodo={handleAddTodo}
                         handleEditTodo={handleEditTodo}
                         closeModal={closeModal}
+                        handleChange={handleChange}
                     />
                 </div>
             )}

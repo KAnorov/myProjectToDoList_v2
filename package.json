@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "my_server": "node --experimental-sqlite --watch my_server.mjs",
-    "server": "npx json-server --watch db.json --port 3333",
+    "server": "npx json-server --watch db.json --port 3333 -d 1000",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
